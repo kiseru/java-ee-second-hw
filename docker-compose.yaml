@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+  rabbit:
+    image: rabbitmq:3.7.7-management
+    restart: always
+    ports:
+      - 15672:15672
+  db:
+    image: postgres:10.5
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+  userservice:
+    build: user-service
+    restart: always
+    depends_on:
+      - rabbit
+      - db
+      - uiservice
+  catservice:
+    build: cat-service
+    restart: always
+    depends_on:
+      - rabbit
+      - db
+      - userservice
+      - uiservice
+  uiservice:
+    build: ui-service
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - rabbit
+      - db
+
